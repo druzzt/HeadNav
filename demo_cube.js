@@ -111,7 +111,7 @@ function init_babylonScene(spec){
 function main(){
     JEEFACEFILTERAPI.init({
         canvasId: 'jeeFaceFilterCanvas',
-        NNCpath: '/', //root of NNC.json file
+        NNCpath: 'https://druzzt.github.io/HeadNav/', //root of NNC.json file
         callbackReady: function(errCode, spec){
             if (errCode){
                 console.log('AN ERROR HAPPENS. SORRY BRO :( . ERR =', errCode);
