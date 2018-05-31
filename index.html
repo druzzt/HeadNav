@@ -1,116 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- Use correct character set. -->
-  <meta charset="utf-8">
-  <!-- Tell IE to use the latest, best version. -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-  <title>CESIUM JS Head Controls demo</title>
-  <script src="https://druzzt.github.io/HeadNav/cesium/Cesium.js"></script>
-
-  <!-- JEEFACEFILTER API (required by HeadControls.js) -->
-  <script src="https://druzzt.github.io/HeadNav/jeelizFaceFilter.js"></script>
-
-  <!-- Import head controls script -->
-  <script src="https://druzzt.github.io/HeadNav/HeadControls.js"></script>
- 
-
-  <style>
-      @import url(https://druzzt.github.io/HeadNav/cesium/Widgets/widgets.css);
-      html, body, #cesiumContainer {
-          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
-      }
-
-      #startHeadControlsButton {
-        position: fixed;
-        width: 256px;
-        top: 1em;
-        left: 50%;
-        margin-left: -128px;
-        cursor: pointer;
-      }
-
-      #headControlsCanvas {
-        position: fixed;
-        right: 0px;
-        bottom: 30px;
-        z-index: 1000;
-        transform-origin: bottom right;
-        max-height: 25%;
-        max-width: 25%;
-      }
-  </style>
-</head>
-<body>
-  <div id="cesiumContainer"></div>
-
-  <button id='startHeadControlsButton'>START HEAD CONTROLLED NAVIGATION !</button>
-
-  <!-- This canvas will be used to display the head tracking : //-->
-  <canvas id='headControlsCanvas' width='512' height='512'></canvas>
-
-  <script>
-    //some settings
-    var SETTINGS={
-      zoomSensibility: 5.5,
-      panSensibility: 0.00000015
-    };
-
-    //initialize Cesium
-    var CESIUMVIEWER = new Cesium.Viewer('cesiumContainer');
-    var ISHEADCONTROLSON=false,  ISHEADCONTROLSINITIALIZED=false;
-    
-    function toggleHeadControls(isOn){
-      DOMbutton.innerHTML=(isOn)?'Toggle OFF head controls':'toggle ON head controls';
-      HeadControls.toggle(isOn);
-      ISHEADCONTROLSON=isOn;
-    }
-
-    function callbackMove(mv){
-      var cameraHeight = CESIUMVIEWER.scene.globe.ellipsoid.cartesianToCartographic(CESIUMVIEWER.camera.position).height/1000.0 || Number.MAX_VALUE;
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="content-language" content="en-EN" />
         
-      if (mv.dZ!==0) { //move head forward/backward
-        var zoomAmount = mv.dZ * SETTINGS.zoomSensibility * cameraHeight;
-        CESIUMVIEWER.camera.moveForward(zoomAmount);
-      }
-      if (mv.dRx!==0) { //turn head up-down
-        var panAmountX=SETTINGS.panSensibility*mv.dRx* cameraHeight;
-        CESIUMVIEWER.scene.camera.rotateUp(panAmountX);
-      }
-      if (mv.dRy!==0) { //turn head left-right
-        var panAmountY=SETTINGS.panSensibility*mv.dRy* cameraHeight;
-        CESIUMVIEWER.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, panAmountY);
-      }
-    } //end callbackMove()
+        <title>JEELIZ FACE FILTER : BABYLON.JS CUBE DEMO</title>
+        
+        <!-- INCLUDE JEELIZ FACEFILTER SCRIPT -->
+        <script type="text/javascript" src="https://druzzt.github.io/HeadNav/jeelizFaceFilter.js"></script>
 
-    var DOMbutton=document.getElementById('startHeadControlsButton');
+        <!-- INCLUDE BABYLON.JS
+        this is a heavy version of Babylon.js, including many features
+        Build you own minified version of Babylon.js on https://www.babylonjs.com/versionbuilder/
+        -->
+		<script type="text/javascript" src="https://druzzt.github.io/HeadNav/babylonjs/v3_1/babylon.custom.js"></script>
 
-    //the user stats head navigation
-    DOMbutton.onclick=function(){
-      if (ISHEADCONTROLSINITIALIZED){
-        toggleHeadControls(!ISHEADCONTROLSON);
-        return;
-      }
-      ISHEADCONTROLSINITIALIZED=true;
+		<!-- INCLUDE DEMO SCRIPT -->
+		<script type="text/javascript" src="https://druzzt.github.io/HeadNav/demo_cube.js"></script>
 
-      HeadControls.init({
-        canvasId: 'headControlsCanvas',
-        callbackMove: callbackMove,
-        callbackReady: function(err){
-          if (err){
-            console.log('ERROR in index.html : HEAD CONTROLS NOT READY. err =', err);
-          } else {
-            console.log('INFO in index.html : HEAD CONTROLS ARE READY :)');
-            toggleHeadControls(true);
-          }
-        },
-        NNCpath: '/', //where to find NNC.json from this path
-        animateDelay: 2 //avoid DOM lags
-      }); //end HeadControls.init params
-    }; //end DOMbutton.onclick
-  </script>
-</body>
+		<link rel="stylesheet" href="https://druzzt.github.io/HeadNav/style.css" type="text/css" />
+
+		<!-- BABYLONJS CUSTOM SHADER MATERIAL GLSL CODES : -->
+		<script type="application/vertexShader" id="videoMatVertexShaderCode">
+			attribute vec3 position;
+            varying vec2 vUV;
+
+            void main(void){
+                gl_Position=vec4(position, 1.);
+                vUV=0.5+0.5*position.xy;
+            }
+		</script>
+
+		<script type="application/fragmentShader" id="videoMatFragmentShaderCode">
+			precision lowp float;
+            uniform sampler2D samplerVideo;
+            varying vec2 vUV;
+
+            void main(void){
+                gl_FragColor=texture2D(samplerVideo, vUV);
+            }
+		</script>
+
+    </head>
+    
+    <body onload="main()" style='color: white'>
+        <canvas width="600" height="600" id='jeeFaceFilterCanvas'></canvas>
+    </body>
 </html>
+ 
  
